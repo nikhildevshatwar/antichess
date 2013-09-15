@@ -45,22 +45,18 @@ enum coin_type {
 	COIN_BLANK
 };
 
-struct movestep {
-	short count;
-	enum direction dir;
+struct move {
+	struct coin *cn;
+	short sx, sy;		//start
+	short dx, dy;		//end
+	short flags;
+	enum coin_type new_coin;	//used only for respawned moves
 };
 
 struct moveset {
 	int size;
-	struct movestep *possible;
+	struct move *possible;
 	int validCount;
-};
-
-struct move {
-	short sx, sy;		//start
-	short dx, dy;		//end
-	int flags;
-	enum coin_type new_coin;	//used only for respawned moves
 };
 
 struct coin {
@@ -79,7 +75,7 @@ struct coin {
 /******************************** Functions **********************************/
 void moveset_init(struct moveset *ms);
 void moveset_expand(struct moveset *ms);
-void moveset_addMoves(struct moveset *ms, struct coin *cn, enum direction dir, int count);
+void moveset_addMoves(struct moveset *ms, struct coin *cn, short dx, short dy, short flags);
 void moveset_clearAll(struct moveset *ms);
 void moveset_print (struct moveset *ms);
 

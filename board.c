@@ -91,8 +91,9 @@ char ascii_art[][5][6] = {
 struct coin board[8][8];	//current situation - this goes on the stack
 
 void board_init() {
-	int i, j, idx;
+	int i, j, k, idx;
 	short col;
+	struct coin *cn;
 	for(i=0; i<8; i++) {
 		if(i<2)
 			col = COLOR_WHITE;
@@ -111,9 +112,16 @@ void board_init() {
 			case ' ':	idx = 6;	break;
 			}
 			board[i][j] = predefined_coins[idx];
-			board[i][j].color = col;
-			board[i][j].x = j;
-			board[i][j].y = i;
+			cn = &board[i][j];
+			cn->color = col;
+			cn->x = j;
+			cn->y = i;
+			if(col == COLOR_BLACK) {
+				for(k=0; k<cn->num_dir; k++) {
+					cn->x_inc[k] *= -1;
+					cn->y_inc[k] *= -1;
+				}
+			}
 		}
 	}
 }

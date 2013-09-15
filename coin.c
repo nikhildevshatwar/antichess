@@ -75,12 +75,12 @@ int calc_moves_none(struct coin *cn, struct moveset *possible) {
 }
 
 int calc_moves_pawn(struct coin *cn, struct moveset *possible) {
-	if(isOpp(pos(cn, left_str_diag, 1)))
-		moveset_addMoves(possible, cn, left_str_diag, 1);
-	if(isOpp(pos(cn, right_str_diag, 1)))
-		moveset_addMoves(possible, cn, right_str_diag, 1);
-	if(isBlank(pos(cn, str, 1)))
-		moveset_addMoves(possible, cn, str, 1);
+	if(isOpp(pos(cn, 0, 1)))		//left_str_diag
+		moveset_addMoves(possible, cn, pos(cn, 0, 1), MOVE_FLAG_KILLED);
+	if(isBlank(pos(cn, 1, 1)))		//str
+		moveset_addMoves(possible, cn, pos(cn, 1, 1), 0);
+	if(isOpp(pos(cn, 2, 1)))		//right_str_diag
+		moveset_addMoves(possible, cn, pos(cn, 2, 1), MOVE_FLAG_KILLED);
 }
 
 int calc_moves_multi(struct coin *cn, struct moveset *possible) {
@@ -90,13 +90,14 @@ int calc_moves_multi(struct coin *cn, struct moveset *possible) {
 		dir = cn->allowed[i];
 		debug("\tmulti>\tdir = %s\n", dirname[cn->allowed[i]]);
 		count = 1;
-		while(isBlank(pos(cn, i, count)))
+		while(isBlank(pos(cn, i, count))) {
+			moveset_addMoves(possible, cn, pos(cn, i, count), 0);
 			count++;
-		if(isOpp(pos(cn, i, count)))
+		}
+		if(isOpp(pos(cn, i, count))) {
+			moveset_addMoves(possible, cn, pos(cn, i, count), MOVE_FLAG_KILLED);
 			count++;
-		count--;
-		if(count)
-			moveset_addMoves(possible, cn, dir, count);
+		}
 	}
 }
 
@@ -107,7 +108,8 @@ int calc_moves_one(struct coin *cn, struct moveset *possible) {
 		dir = cn->allowed[i];
 		debug("\tsingle>\tdir = %s\n", dirname[cn->allowed[i]]);
 		if( isNotSelf(pos(cn, i, 1)))
-			moveset_addMoves(possible, cn, dir, 1);
+			moveset_addMoves(possible, cn, pos(cn, i, 1), MOVE_FLAG_KILLED);
+		//TODO Update how flag is passed
 	}
 }
 
