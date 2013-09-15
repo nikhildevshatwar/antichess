@@ -8,6 +8,8 @@
 
 #define pos(coin, dir, count) (coin->x + coin->x_inc[dir] * count), (coin->y + coin->y_inc[dir] * count)
 
+#define debug printf
+
 enum direction;
 enum color;
 enum coin_type;
@@ -28,9 +30,9 @@ enum direction {
 };
 
 enum color {
-	WHITE,
-	BLACK,
-	NONE
+	COLOR_WHITE,
+	COLOR_BLACK,
+	COLOR_NONE
 };
 
 enum coin_type {
@@ -77,7 +79,7 @@ struct coin {
 /******************************** Functions **********************************/
 void moveset_init(struct moveset *ms);
 void moveset_expand(struct moveset *ms);
-void moveset_addMoves(struct moveset *ms, enum direction dir, int count);
+void moveset_addMoves(struct moveset *ms, struct coin *cn, enum direction dir, int count);
 void moveset_clearAll(struct moveset *ms);
 void moveset_print (struct moveset *ms);
 
@@ -91,6 +93,7 @@ int isNotSelf(short x, short y);
 int calc_moves_multi(struct coin *cn, struct moveset *possible);
 int calc_moves_one(struct coin *cn, struct moveset *possible);
 int calc_moves_pawn(struct coin *cn, struct moveset *possible);
+int calc_moves_none(struct coin *cn, struct moveset *possible);
 
 int king_isValidMove(struct coin *cn, struct move *mv);
 int queen_isValidMove(struct coin *cn, struct move *mv);
@@ -101,4 +104,7 @@ int pawn_isValidMove(struct coin *cn, struct move *mv);
 
 extern struct coin board[8][8];
 extern struct coin predefined_coins[];
+extern enum color COLOR_OPP;
+extern enum color COLOR_SELF;
+extern char *dirname[];;
 #endif

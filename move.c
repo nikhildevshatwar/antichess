@@ -35,14 +35,14 @@ void moveset_clearAll(struct moveset *ms) {
 	ms->validCount = 0;
 }
 
-void moveset_addMoves(struct moveset *ms, enum direction dir, int count) {
-printf("Adding move\n");
+void moveset_addMoves(struct moveset *ms, struct coin *cn, enum direction dir, int count) {
 	if(ms->validCount == ms->size) {
 		moveset_expand(ms);
 	}
 	ms->possible[ms->validCount].count = count;
 	ms->possible[ms->validCount].dir = dir;
 	ms->validCount++;
+printf("Adding move no %2d - %s(%d,%d) -> %s -> (%d,%d)\n", ms->validCount, cn->name, cn->x, cn->y, dirname[dir], pos(cn, dir, count));
 }
 
 void moveset_print (struct moveset *ms) {

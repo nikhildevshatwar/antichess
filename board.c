@@ -14,6 +14,17 @@ char *selColorWhite = KRED;
 char *selColorBlack = KCYN;
 char *selColorNone = KWHT;
 
+char *dirname[] = {
+	"left",
+	"left_str_diag",
+	"str",
+	"right_str_diag",
+	"right",
+	"right_back_diag",
+	"back",
+	"left_back_diag",
+};
+
 char initial_setup[8][8] = {
 	'r','n','b','q','k','b','n','r',
 	'p','p','p','p','p','p','p','p',
@@ -79,86 +90,16 @@ char ascii_art[][5][6] = {
 
 struct coin board[8][8];	//current situation - this goes on the stack
 
-struct coin predefined_coins[] = {
-	{
-		.type = COIN_KING,
-		.name = "King",
-		.calc_moves = calc_moves_one,
-		.isValid = king_isValidMove,
-		.allowed = { left, left_str_diag, str, right_str_diag, right, right_back_diag, back, left_back_diag },
-		.x_inc = {-1, -1, 0, 1, 1, 1, 0, -1},
-		.y_inc = {0, 1, 1, 1, 0, -1, -1, -1},
-		.num_dir = 8,
-	},
-	{
-		.type = COIN_QUEEN,
-		.name = "Queen",
-		.calc_moves = calc_moves_multi,
-		.isValid = queen_isValidMove,
-		.allowed = { left, left_str_diag, str, right_str_diag, right, right_back_diag, back, left_back_diag },
-		.x_inc = {-1, -1, 0, 1, 1, 1, 0, -1},
-		.y_inc = {0, 1, 1, 1, 0, -1, -1, -1},
-		.num_dir = 8,
-	},
-	{
-		.type = COIN_BISHOP,
-		.name = "Bishop",
-		.calc_moves = calc_moves_multi,
-		.isValid = bishop_isValidMove,
-		.allowed = { left_str_diag, right_str_diag, right_back_diag, left_back_diag },
-		.x_inc = {-1, 1, 1, -1},
-		.y_inc = {1, 1, -1, -1},
-		.num_dir = 4,
-	},
-	{
-		.type = COIN_KNIGHT,
-		.name = "Knight",
-		.calc_moves = calc_moves_one,
-		.isValid = knight_isValidMove,
-		.allowed = { left, left_str_diag, str, right_str_diag, right, right_back_diag, back, left_back_diag },
-		.x_inc = {-2, -2, -1, 1, 2, 2, 1, -1},
-		.y_inc = {-1, 1, 2, 2, 1, -1, -2, -2},
-		.num_dir = 8,
-	},
-	{
-		.type = COIN_ROOK,
-		.name = "Rook",
-		.calc_moves = calc_moves_multi,
-		.isValid = rook_isValidMove,
-		.allowed = { left, str, right, back },
-		.x_inc = {-1, 0, 1, 0},
-		.y_inc = {0, 1, 0, -1},
-		.num_dir = 4,
-	},
-	{
-		.type = COIN_PAWN,
-		.name = "Pawn",
-		.calc_moves = calc_moves_pawn,
-		.isValid = pawn_isValidMove,
-		.allowed = { left_str_diag, str, right_str_diag },
-		.x_inc = {-1, 0, 1 },
-		.y_inc = {1, 1, 1 },
-		.num_dir = 3,
-	},
-	{
-		.type = COIN_BLANK,
-		.name = "Blank",
-		.calc_moves = NULL,
-		.isValid = NULL,
-		.num_dir = 0,
-	},
-};
-
 void board_init() {
 	int i, j, idx;
 	short col;
 	for(i=0; i<8; i++) {
 		if(i<2)
-			col = WHITE;
+			col = COLOR_WHITE;
 		else if(i>5)
-			col = BLACK;
+			col = COLOR_BLACK;
 		else
-			col = NONE;
+			col = COLOR_NONE;
 		for(j=0; j<8; j++) {
 			switch(initial_setup[i][j]) {
 			case 'k':	idx = 0;	break;
@@ -171,6 +112,8 @@ void board_init() {
 			}
 			board[i][j] = predefined_coins[idx];
 			board[i][j].color = col;
+			board[i][j].x = j;
+			board[i][j].y = i;
 		}
 	}
 }
@@ -178,7 +121,7 @@ void board_init() {
 void board_print() {
 	int i, j;
 	char disp[] = { 'k','q','b','n','r','p',' ' };
-	for(i=0; i<8; i++) {
+	for(i=7; i>=0; i--) {
 		printf("\n+---+---+---+---+---+---+---+---+\n|");
 		for(j=0; j<8; j++) {
 			printf(" %c +", disp[board[i][j].type]);
@@ -191,7 +134,7 @@ void board_print_asciiart() {
 	int i, j, k, idx;
 	char s;
 	char *col;
-	for(i=0; i<8; i++) {
+	for(i=7; i>=0; i--) {
 		for(k=0; k<5; k++) {
 			if(k==4)
 				s='_';
@@ -199,13 +142,14 @@ void board_print_asciiart() {
 				s=' ';
 			for(j=0; j<8; j++) {
 				idx = board[i][j].type;
-				if(board[i][j].color == WHITE)
+				if(board[i][j].color == COLOR_WHITE)
 					col = selColorWhite;
-				else if (board[i][j].color == BLACK)
+				else if (board[i][j].color == COLOR_BLACK)
 					col = selColorBlack;
 				else
 					col = selColorNone;
-				printf("%s|%c%c%5s%c%c", col, s, s, ascii_art[idx][k], s, s);
+//				printf("%s|%c%c%5s%c%c", col, s, s, ascii_art[idx][k], s, s);
+				printf("%s|%2d%5s%2d", col, board[i][j].x, ascii_art[idx][k], board[i][j].y);
 			}
 			printf("|\n");
 		}
@@ -213,14 +157,32 @@ void board_print_asciiart() {
 }
 
 int isOpp(short x, short y) {
-	return 0;
+	debug ("\t\tAttempting to kill %d %d\n", x, y);
+	if(x<0 || y<0 || x>7 || y>7)
+		return 0;
+	if(board[y][x].color == COLOR_OPP)
+		return 1;
+	else
+		return 0;
 }
 
 int isBlank(short x, short y) {
-	return 0;
+	debug ("\t\tAttempting to reach %d %d\n", x, y);
+	if(x<0 || y<0 || x>7 || y>7)
+		return 0;
+	if(board[y][x].color == COLOR_NONE)
+		return 1;
+	else
+		return 0;
 }
 
 int isNotSelf(short x, short y) {
-	return 0;
+	debug ("\t\tAttempting to move %d %d\n", x, y);
+	if(x<0 || y<0 || x>7 || y>7)
+		return 0;
+	if(board[y][x].color != COLOR_SELF)
+		return 1;
+	else
+		return 0;
 }
 

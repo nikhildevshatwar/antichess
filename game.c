@@ -24,16 +24,20 @@ opt2 - make board as array of pointers to the struct coin
 		Might be dangerous, 
 */
 
+enum color COLOR_SELF = COLOR_WHITE;
+enum color COLOR_OPP = COLOR_BLACK;
+
 calc (struct  moveset *ms) {
 	int i,j;
 	struct coin *cn;
 	for(i=0; i<8; i++) {
 		for(j=0; j<8; j++) {
 			cn = &board[i][j];
+			debug("Calculating move for %s(%d,%d)\n", cn->name, cn->x, cn->y);
 			(*cn->calc_moves)(cn, ms);
-		moveset_print(ms);
 		}
 	}
+	moveset_print(ms);
 }
 
 int main() {
