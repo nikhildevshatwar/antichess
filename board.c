@@ -128,6 +128,7 @@ struct coin predefined_coins[] = {
 		.allowed = { left, str, right, back },
 		.x_inc = {-1, 0, 1, 0},
 		.y_inc = {0, 1, 0, -1},
+		.num_dir = 4,
 	},
 	{
 		.type = COIN_PAWN,
