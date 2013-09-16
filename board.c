@@ -156,8 +156,11 @@ void board_print_asciiart() {
 					col = selColorBlack;
 				else
 					col = selColorNone;
-//				printf("%s|%c%c%5s%c%c", col, s, s, ascii_art[idx][k], s, s);
-				printf("%s|%2d%5s%2d", col, board[i][j].x, ascii_art[idx][k], board[i][j].y);
+//TODO Improve printing of black cells
+// Background color '.' can be used to show black cells
+
+				printf("%s|%c%c%5s%c%c", col, s, s, ascii_art[idx][k], s, s);
+//				printf("%s|%2d%5s%2d", col, board[i][j].x, ascii_art[idx][k], board[i][j].y);
 			}
 			printf("|\n");
 		}

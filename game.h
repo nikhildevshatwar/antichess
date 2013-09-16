@@ -3,12 +3,19 @@
 
 #include <stdio.h>
 
+//#define DEBUG
+
 #define MOVE_FLAG_RESPAWN	1<<0
 #define MOVE_FLAG_KILLED	1<<1
 
-#define pos(coin, dir, count) (coin->x + coin->x_inc[dir] * count), (coin->y + coin->y_inc[dir] * count)
+#ifdef DEBUG
+	#define debug printf
+#else
+	#define debug(...)
+#endif
 
-#define debug printf
+#define pos(coin, dir, count) (coin->x + coin->x_inc[dir] * count), (coin->y + coin->y_inc[dir] * count)
+#define get_ypos(coin) coin->color == COLOR_WHITE ? coin->y : 7 - coin->y
 
 enum direction;
 enum color;

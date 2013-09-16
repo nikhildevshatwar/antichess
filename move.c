@@ -50,7 +50,7 @@ void moveset_addMoves(struct moveset *ms, struct coin *cn, short dx, short dy, s
 	mv->dy = dy;
 	mv->flags = flags;
 	ms->validCount++;
-	printf("Adding move no %2d - %s(%d,%d) -> (%d,%d)\n", ms->validCount, cn->name, cn->x, cn->y, dx, dy);
+	debug("Adding move no %2d - %s(%d,%d) -> (%d,%d)\n", ms->validCount, cn->name, cn->x, cn->y, dx, dy);
 }
 
 void moveset_print (struct moveset *ms) {

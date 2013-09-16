@@ -34,6 +34,8 @@ calc (struct  moveset *ms) {
 		for(j=0; j<8; j++) {
 			cn = &board[i][j];
 			debug("Calculating move for %s(%d,%d)\n", cn->name, cn->x, cn->y);
+			if(cn->color != COLOR_SELF)
+				continue;
 			(*cn->calc_moves)(cn, ms);
 		}
 	}

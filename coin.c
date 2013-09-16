@@ -77,8 +77,11 @@ int calc_moves_none(struct coin *cn, struct moveset *possible) {
 int calc_moves_pawn(struct coin *cn, struct moveset *possible) {
 	if(isOpp(pos(cn, 0, 1)))		//left_str_diag
 		moveset_addMoves(possible, cn, pos(cn, 0, 1), MOVE_FLAG_KILLED);
-	if(isBlank(pos(cn, 1, 1)))		//str
+	if(isBlank(pos(cn, 1, 1))) {		//str
 		moveset_addMoves(possible, cn, pos(cn, 1, 1), 0);
+		if(get_ypos(cn) == 1 && isBlank(pos(cn, 1, 2)))
+			moveset_addMoves(possible, cn, pos(cn, 1, 2), 0);
+	}
 	if(isOpp(pos(cn, 2, 1)))		//right_str_diag
 		moveset_addMoves(possible, cn, pos(cn, 2, 1), MOVE_FLAG_KILLED);
 }
@@ -107,9 +110,10 @@ int calc_moves_one(struct coin *cn, struct moveset *possible) {
 	for(i=0; i<cn->num_dir; i++) {
 		dir = cn->allowed[i];
 		debug("\tsingle>\tdir = %s\n", dirname[cn->allowed[i]]);
-		if( isNotSelf(pos(cn, i, 1)))
+		if( isBlank(pos(cn, i, 1)))
+			moveset_addMoves(possible, cn, pos(cn, i, 1), 0);
+		else if( isOpp(pos(cn, i, 1)))
 			moveset_addMoves(possible, cn, pos(cn, i, 1), MOVE_FLAG_KILLED);
-		//TODO Update how flag is passed
 	}
 }
 
