@@ -142,6 +142,7 @@ void board_print_asciiart() {
 	int i, j, k, idx;
 	char s;
 	char *col;
+	printf("%s _________ _________ _________ _________ _________ _________ _________ _________\n", selColorNone);
 	for(i=7; i>=0; i--) {
 		for(k=0; k<5; k++) {
 			if(k==4)

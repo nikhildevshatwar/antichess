@@ -64,6 +64,7 @@ struct coin predefined_coins[] = {
 	{
 		.type = COIN_BLANK,
 		.name = "Blank",
+		.color = COLOR_NONE,
 		.calc_moves = calc_moves_none,
 		.isValid = NULL,
 		.num_dir = 0,

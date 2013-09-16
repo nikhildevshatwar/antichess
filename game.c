@@ -27,6 +27,13 @@ opt2 - make board as array of pointers to the struct coin
 enum color COLOR_SELF = COLOR_WHITE;
 enum color COLOR_OPP = COLOR_BLACK;
 
+void swapPlayers() {
+	int temp;
+	temp = COLOR_SELF;
+	COLOR_SELF = COLOR_OPP;
+	COLOR_OPP = temp;
+}
+
 calc (struct  moveset *ms) {
 	int i,j;
 	struct coin *cn;
@@ -39,7 +46,25 @@ calc (struct  moveset *ms) {
 			(*cn->calc_moves)(cn, ms);
 		}
 	}
-	moveset_print(ms);
+}
+
+void iterate(struct moveset *ms) {
+	int i;
+	struct move *mv;
+	struct coin *srccn;
+	struct coin *dstcn;
+	for(i=0; i<ms->validCount; i++) {
+		mv = &ms->possible[i];
+		printf("Performing %d move %d,%d -> %d->%d\n", i, mv->sx, mv->sy, mv->dx, mv->dy);
+		srccn = mv->cn;
+		dstcn = &board[mv->dy][mv->dx];
+		*dstcn = *srccn;
+		*srccn = predefined_coins[6];
+		board_print_asciiart();
+		*srccn = *dstcn;
+		*dstcn = predefined_coins[6];
+		getchar();
+	}
 }
 
 int main() {
@@ -49,5 +74,13 @@ int main() {
 //	board_print();
 	board_print_asciiart();
 	calc(&ms);
+getchar();
+	moveset_print(&ms);
+	iterate(&ms);
+	swapPlayers();
+	moveset_init (&ms);
+	calc(&ms);
+	iterate(&ms);
+	board_print_asciiart();
 	return 0;
 }
