@@ -63,7 +63,6 @@ void iterate(struct moveset *ms) {
 		board_print_asciiart();
 		*srccn = *dstcn;
 		*dstcn = predefined_coins[6];
-		getchar();
 	}
 }
 
@@ -74,7 +73,6 @@ int main() {
 //	board_print();
 	board_print_asciiart();
 	calc(&ms);
-getchar();
 	moveset_print(&ms);
 	iterate(&ms);
 	swapPlayers();
