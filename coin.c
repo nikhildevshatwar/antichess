@@ -1,8 +1,7 @@
 #include "game.h"
 
-struct coin predefined_coins[] = {
-	{
-		.type = COIN_KING,
+struct coin_properties fixed_props[] = {
+	[COIN_KING] = {
 		.name = "King",
 		.calc_moves = calc_moves_one,
 		.isValid = king_isValidMove,
@@ -10,9 +9,15 @@ struct coin predefined_coins[] = {
 		.x_inc = {-1, -1, 0, 1, 1, 1, 0, -1},
 		.y_inc = {0, 1, 1, 1, 0, -1, -1, -1},
 		.num_dir = 8,
+		.ascii_art = {
+			' ','_','+','_',' ','\0',
+			' ','\\',' ','/',' ','\0',
+			' ','(',' ',')',' ','\0',
+			' ','/',' ','\\',' ','\0',
+			'=','=','=','=','=','\0',
+		}
 	},
-	{
-		.type = COIN_QUEEN,
+	[COIN_QUEEN] = {
 		.name = "Queen",
 		.calc_moves = calc_moves_multi,
 		.isValid = queen_isValidMove,
@@ -20,9 +25,15 @@ struct coin predefined_coins[] = {
 		.x_inc = {-1, -1, 0, 1, 1, 1, 0, -1},
 		.y_inc = {0, 1, 1, 1, 0, -1, -1, -1},
 		.num_dir = 8,
+		.ascii_art = {
+			' ','x','x','x',' ','\0',
+			' ','\\',' ','/',' ','\0',
+			' ','(',' ',')',' ','\0',
+			' ','/',' ','\\',' ','\0',
+			'=','=','=','=','=','\0',
+		}
 	},
-	{
-		.type = COIN_BISHOP,
+	[COIN_BISHOP] = {
 		.name = "Bishop",
 		.calc_moves = calc_moves_multi,
 		.isValid = bishop_isValidMove,
@@ -30,9 +41,15 @@ struct coin predefined_coins[] = {
 		.x_inc = {-1, 1, 1, -1},
 		.y_inc = {1, 1, -1, -1},
 		.num_dir = 4,
+		.ascii_art = {
+			' ',' ',' ',' ',' ','\0',
+			' ',' ','O',' ',' ','\0',
+			' ','(','/',')',' ','\0',
+			' ','/',' ','\\',' ','\0',
+			'_','=','=','=','_','\0',
+		}
 	},
-	{
-		.type = COIN_KNIGHT,
+	[COIN_KNIGHT] = {
 		.name = "Knight",
 		.calc_moves = calc_moves_one,
 		.isValid = knight_isValidMove,
@@ -40,9 +57,15 @@ struct coin predefined_coins[] = {
 		.x_inc = {-2, -2, -1, 1, 2, 2, 1, -1},
 		.y_inc = {-1, 1, 2, 2, 1, -1, -2, -2},
 		.num_dir = 8,
+		.ascii_art = {
+			' ',' ',' ',' ',' ','\0',
+			' ',',','^','.',' ','\0',
+			'(',' ',' ','\'','\\','\0',
+			'|',' ',' ','\\',' ','\0',
+			'=','=','=','=','_','\0',
+		}
 	},
-	{
-		.type = COIN_ROOK,
+	[COIN_ROOK] = {
 		.name = "Rook",
 		.calc_moves = calc_moves_multi,
 		.isValid = rook_isValidMove,
@@ -50,9 +73,15 @@ struct coin predefined_coins[] = {
 		.x_inc = {-1, 0, 1, 0},
 		.y_inc = {0, 1, 0, -1},
 		.num_dir = 4,
+		.ascii_art = {
+			' ',' ',' ',' ',' ','\0',
+			' ','u','u','u',' ','\0',
+			' ','|',' ','|',' ','\0',
+			' ','/',' ','\\',' ','\0',
+			'_','=','=','=','_','\0',
+		}
 	},
-	{
-		.type = COIN_PAWN,
+	[COIN_PAWN] = {
 		.name = "Pawn",
 		.calc_moves = calc_moves_pawn,
 		.isValid = pawn_isValidMove,
@@ -60,20 +89,31 @@ struct coin predefined_coins[] = {
 		.x_inc = {-1, 0, 1 },
 		.y_inc = {1, 1, 1 },
 		.num_dir = 3,
+		.ascii_art = {
+			' ',' ',' ',' ',' ','\0',
+			' ',' ','_',' ',' ','\0',
+			' ','(',' ',')',' ','\0',
+			' ','/',' ','\\',' ','\0',
+			'_','=','=','=','_','\0',
+		}
 	},
-	{
-		.type = COIN_BLANK,
+	[COIN_BLANK] = {
 		.name = "Blank",
-		.color = COLOR_NONE,
-		.calc_moves = calc_moves_none,
+		.calc_moves = NULL,
 		.isValid = NULL,
+		.allowed = { },
+		.x_inc = { },
+		.y_inc = { },
 		.num_dir = 0,
+		.ascii_art = {
+			"     ",
+			"     ",
+			"     ",
+			"     ",
+			"_____",
+		}
 	},
 };
-
-int calc_moves_none(struct coin *cn, struct moveset *possible) {
-
-}
 
 int calc_moves_pawn(struct coin *cn, struct moveset *possible) {
 	int flags = 0;
@@ -93,8 +133,8 @@ int calc_moves_pawn(struct coin *cn, struct moveset *possible) {
 int calc_moves_multi(struct coin *cn, struct moveset *possible) {
 	int i, count;
 	enum direction dir;
-	for(i=0; i<cn->num_dir; i++) {
-		dir = cn->allowed[i];
+	for(i=0; i<fixed_props[cn->type].num_dir; i++) {
+		dir = fixed_props[cn->type].allowed[i];
 		debug("\tmulti>\tdir = %s\n", dirname[cn->allowed[i]]);
 		count = 1;
 		while(isBlank(pos(cn, i, count))) {
@@ -111,8 +151,8 @@ int calc_moves_multi(struct coin *cn, struct moveset *possible) {
 int calc_moves_one(struct coin *cn, struct moveset *possible) {
 	int i;
 	enum direction dir;
-	for(i=0; i<cn->num_dir; i++) {
-		dir = cn->allowed[i];
+	for(i=0; i<fixed_props[cn->type].num_dir; i++) {
+		dir = fixed_props[cn->type].allowed[i];
 		debug("\tsingle>\tdir = %s\n", dirname[cn->allowed[i]]);
 		if( isBlank(pos(cn, i, 1)))
 			moveset_addMoves(possible, cn, pos(cn, i, 1), 0);

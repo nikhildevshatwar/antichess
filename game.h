@@ -14,8 +14,9 @@
 	#define debug(...)
 #endif
 
-#define pos(coin, dir, count) (coin->x + coin->x_inc[dir] * count), (coin->y + coin->y_inc[dir] * count)
+#define pos(coin, dir, count) (coin->x + fixed_props[coin->type].x_inc[dir] * count), (coin->y + fixed_props[coin->type].y_inc[dir] * count)
 #define get_ypos(coin) coin->color == COLOR_WHITE ? coin->y : 7 - coin->y
+#define to_coin_data(coinptr) ((struct coin_data *) &(coinptr)->type)
 
 enum direction;
 enum color;
@@ -23,6 +24,9 @@ enum coin_type;
 struct coin;
 struct move;
 struct moveset;
+struct coin_data;
+struct coin;
+struct coin_properties;
 
 enum direction {
 	left,
@@ -66,9 +70,18 @@ struct moveset {
 	int validCount;
 };
 
-struct coin {
+struct coin_data {
 	enum coin_type type;
 	short color;
+};
+
+struct coin {
+	short x,y;
+	enum coin_type type;
+	short color;
+};
+
+struct coin_properties {
 	char *name;						// name of the coin - can be Blank
 	int (*calc_moves)(struct coin *, struct moveset *);	// return no of moves added, and update moveset
 	int (*isValid)(struct coin *, struct move *);		// return wheather a move is correct or not
@@ -76,7 +89,7 @@ struct coin {
 	short num_dir;
 	short x_inc[MAX_DIR];				// table of increments for a specific coin when a move is performed
 	short y_inc[MAX_DIR];				// no casteling, so only one value per direction per coin
-	short x,y;					//x and y constant
+	char ascii_art[5][6];
 };
 
 /******************************** Functions **********************************/
@@ -106,7 +119,7 @@ int rook_isValidMove(struct coin *cn, struct move *mv);
 int pawn_isValidMove(struct coin *cn, struct move *mv);
 
 extern struct coin board[8][8];
-extern struct coin predefined_coins[];
+extern struct coin_properties fixed_props[];
 extern enum color COLOR_OPP;
 extern enum color COLOR_SELF;
 extern char *dirname[];;

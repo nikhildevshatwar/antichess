@@ -43,7 +43,7 @@ calc (struct  moveset *ms) {
 			debug("Calculating move for %s(%d,%d)\n", cn->name, cn->x, cn->y);
 			if(cn->color != COLOR_SELF)
 				continue;
-			(*cn->calc_moves)(cn, ms);
+			(*fixed_props[cn->type].calc_moves)(cn, ms);
 		}
 	}
 }
@@ -51,34 +51,46 @@ calc (struct  moveset *ms) {
 void iterate(struct moveset *ms) {
 	int i;
 	struct move *mv;
-	struct coin *srccn;
-	struct coin *dstcn;
+	struct coin_data *srcdata;
+	struct coin_data *dstdata;
+	struct coin_data temp;
+	struct coin_data empty = { .color = COLOR_NONE, .type = COIN_BLANK };
 	for(i=0; i<ms->validCount; i++) {
 		mv = &ms->possible[i];
 		printf("Performing %d move %d,%d -> %d->%d\n", i, mv->sx, mv->sy, mv->dx, mv->dy);
-		srccn = mv->cn;
-		dstcn = &board[mv->dy][mv->dx];
-		*dstcn = *srccn;
-		*srccn = predefined_coins[6];
+		srcdata = to_coin_data(mv->cn);
+		dstdata = to_coin_data(&board[mv->dy][mv->dx]);
+	//Make the move
+		temp = *dstdata;
+		*dstdata = *srcdata;
+		*srcdata = empty;
+	//Print the board
 		board_print_asciiart();
-		*srccn = *dstcn;
-		*dstcn = predefined_coins[6];
+	//Restore the move
+		*srcdata = *dstdata;
+		*dstdata = temp;
+getchar();
 	}
 }
 
 int main() {
 	struct moveset ms;
+
 	moveset_init (&ms);
 	board_init();
-//	board_print();
+	board_print();
 	board_print_asciiart();
+	getchar();
+
 	calc(&ms);
 	moveset_print(&ms);
+
 	iterate(&ms);
 	swapPlayers();
 	moveset_init (&ms);
 	calc(&ms);
 	iterate(&ms);
 	board_print_asciiart();
+
 	return 0;
 }

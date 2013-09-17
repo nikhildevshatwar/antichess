@@ -36,62 +36,11 @@ char initial_setup[8][8] = {
 	'r','n','b','q','k','b','n','r',
 };
 
-char ascii_art[][5][6] = {
-	{
-		' ','_','+','_',' ','\0',
-		' ','\\',' ','/',' ','\0',
-		' ','(',' ',')',' ','\0',
-		' ','/',' ','\\',' ','\0',
-		'=','=','=','=','=','\0',
-	},
-	{
-		' ','x','x','x',' ','\0',
-		' ','\\',' ','/',' ','\0',
-		' ','(',' ',')',' ','\0',
-		' ','/',' ','\\',' ','\0',
-		'=','=','=','=','=','\0',
-	},
-	{
-		' ',' ',' ',' ',' ','\0',
-		' ',' ','O',' ',' ','\0',
-		' ','(','/',')',' ','\0',
-		' ','/',' ','\\',' ','\0',
-		'_','=','=','=','_','\0',
-	},
-	{
-		' ',' ',' ',' ',' ','\0',
-		' ',',','^','.',' ','\0',
-		'(',' ',' ','\'','\\','\0',
-		'|',' ',' ','\\',' ','\0',
-		'=','=','=','=','_','\0',
-	},
-	{
-		' ',' ',' ',' ',' ','\0',
-		' ','u','u','u',' ','\0',
-		' ','|',' ','|',' ','\0',
-		' ','/',' ','\\',' ','\0',
-		'_','=','=','=','_','\0',
-	},
-   	{
-		' ',' ',' ',' ',' ','\0',
-		' ',' ','_',' ',' ','\0',
-		' ','(',' ',')',' ','\0',
-		' ','/',' ','\\',' ','\0',
-		'_','=','=','=','_','\0',
-	},
-	{
-		"     ",
-		"     ",
-		"     ",
-		"     ",
-		"_____",
-	},
-};
-
 struct coin board[8][8];	//current situation - this goes on the stack
 
 void board_init() {
 	int i, j, k, idx;
+	enum coin_type type;
 	short col;
 	struct coin *cn;
 	for(i=0; i<8; i++) {
@@ -102,26 +51,31 @@ void board_init() {
 		else
 			col = COLOR_NONE;
 		for(j=0; j<8; j++) {
-			switch(initial_setup[i][j]) {
-			case 'k':	idx = 0;	break;
-			case 'q':	idx = 1;	break;
-			case 'b':	idx = 2;	break;
-			case 'n':	idx = 3;	break;
-			case 'r':	idx = 4;	break;
-			case 'p':	idx = 5;	break;
-			case ' ':	idx = 6;	break;
-			}
-			board[i][j] = predefined_coins[idx];
 			cn = &board[i][j];
-			cn->color = col;
 			cn->x = j;
 			cn->y = i;
+			switch(initial_setup[i][j]) {
+			case 'k':	type = COIN_KING;	break;
+			case 'q':	type = COIN_QUEEN;	break;
+			case 'b':	type = COIN_BISHOP;	break;
+			case 'n':	type = COIN_KNIGHT;	break;
+			case 'r':	type = COIN_ROOK;	break;
+			case 'p':	type = COIN_PAWN;	break;
+			case ' ':	type = COIN_BLANK;	break;
+			}
+			cn->type = type;
+			cn->color = col;
+/*
+For all black coins, the coefficients are negative
+- Define in fixed_props again (type = 0-7 for WHITE and 8-13 for BLACK)
+- Change the macro to make it negative when applying the coefficients
 			if(col == COLOR_BLACK) {
 				for(k=0; k<cn->num_dir; k++) {
 					cn->x_inc[k] *= -1;
 					cn->y_inc[k] *= -1;
 				}
 			}
+*/
 		}
 	}
 }
@@ -135,7 +89,7 @@ void board_print() {
 			printf(" %c +", disp[board[i][j].type]);
 		}
 	}
-	printf("\n+---+---+---+---+---+---+---+---+\n|");
+	printf("\n+---+---+---+---+---+---+---+---+\n");
 }
 
 void board_print_asciiart() {
@@ -160,7 +114,7 @@ void board_print_asciiart() {
 //TODO Improve printing of black cells
 // Background color '.' can be used to show black cells
 
-				printf("%s|%c%c%5s%c%c", col, s, s, ascii_art[idx][k], s, s);
+				printf("%s|%c%c%5s%c%c", col, s, s, fixed_props[idx].ascii_art[k], s, s);
 //				printf("%s|%2d%5s%2d", col, board[i][j].x, ascii_art[idx][k], board[i][j].y);
 			}
 			printf("|\n");

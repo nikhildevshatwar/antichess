@@ -50,7 +50,7 @@ void moveset_addMoves(struct moveset *ms, struct coin *cn, short dx, short dy, s
 	mv->dy = dy;
 	mv->flags = flags;
 	ms->validCount++;
-	debug("Adding move no %2d - %s(%d,%d) -> (%d,%d)\n", ms->validCount, cn->name, cn->x, cn->y, dx, dy);
+	debug("Adding move no %2d - %s(%d,%d) -> (%d,%d)\n", ms->validCount, fixed_props[cn->type].name, cn->x, cn->y, dx, dy);
 }
 
 void moveset_print (struct moveset *ms) {
@@ -58,6 +58,6 @@ void moveset_print (struct moveset *ms) {
 	struct move *mv;
 	for(i=0; i<ms->validCount; i++) 	{
 		mv = &ms->possible[i];
-		printf("%s(%d,%d) -> (%d %d)\n", mv->cn->name, mv->sx, mv->sy, mv->dx, mv->dy);
+		printf("%s(%d,%d) -> (%d %d)\n", fixed_props[mv->cn->type].name, mv->sx, mv->sy, mv->dx, mv->dy);
 	}
 }
