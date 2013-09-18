@@ -14,7 +14,7 @@
 	#define debug(...)
 #endif
 
-#define pos(coin, dir, count) (coin->x + fixed_props[coin->type].x_inc[dir] * count), (coin->y + fixed_props[coin->type].y_inc[dir] * count)
+#define pos(coin, dir, count) (coin->x + fixed_props[coin->type].x_inc[dir] * count * multiplier(coin)), (coin->y + fixed_props[coin->type].y_inc[dir] * count * multiplier(coin))
 #define get_ypos(coin) coin->color == COLOR_WHITE ? coin->y : 7 - coin->y
 #define to_coin_data(coinptr) ((struct coin_data *) &(coinptr)->type)
 
