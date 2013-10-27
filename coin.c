@@ -115,48 +115,48 @@ struct coin_properties fixed_props[] = {
 	},
 };
 
-int calc_moves_pawn(struct coin *cn, struct moveset *possible) {
+int calc_moves_pawn(struct state *st, struct coin *cn, struct moveset *possible) {
 	int flags = 0;
 	if(get_ypos(cn) == 6)
 		flags |= MOVE_FLAG_RESPAWN;
-	if(isOpp(pos(cn, 0, 1)))			//left_str_diag
+	if(isOpp(st, pos(cn, 0, 1)))			//left_str_diag
 		moveset_addMoves(possible, cn, pos(cn, 0, 1), flags | MOVE_FLAG_KILLED);
-	if(isBlank(pos(cn, 1, 1))) {			//str
+	if(isBlank(st, pos(cn, 1, 1))) {			//str
 		moveset_addMoves(possible, cn, pos(cn, 1, 1), flags);
-		if(get_ypos(cn) == 1 && isBlank(pos(cn, 1, 2)))		//handle 2moves if at start
+		if(get_ypos(cn) == 1 && isBlank(st, pos(cn, 1, 2)))		//handle 2moves if at start
 			moveset_addMoves(possible, cn, pos(cn, 1, 2), 0);
 	}
-	if(isOpp(pos(cn, 2, 1)))			//right_str_diag
+	if(isOpp(st, pos(cn, 2, 1)))			//right_str_diag
 		moveset_addMoves(possible, cn, pos(cn, 2, 1), flags | MOVE_FLAG_KILLED);
 }
 
-int calc_moves_multi(struct coin *cn, struct moveset *possible) {
+int calc_moves_multi(struct state *st, struct coin *cn, struct moveset *possible) {
 	int i, count;
 	enum direction dir;
 	for(i=0; i<fixed_props[cn->type].num_dir; i++) {
 		dir = fixed_props[cn->type].allowed[i];
-		debug("\tmulti>\tdir = %s\n", dirname[cn->allowed[i]]);
+		debug("\tmulti>\tdir = %s\n", dirname[dir]);
 		count = 1;
-		while(isBlank(pos(cn, i, count))) {
+		while(isBlank(st, pos(cn, i, count))) {
 			moveset_addMoves(possible, cn, pos(cn, i, count), 0);
 			count++;
 		}
-		if(isOpp(pos(cn, i, count))) {
+		if(isOpp(st, pos(cn, i, count))) {
 			moveset_addMoves(possible, cn, pos(cn, i, count), MOVE_FLAG_KILLED);
 			count++;
 		}
 	}
 }
 
-int calc_moves_one(struct coin *cn, struct moveset *possible) {
+int calc_moves_one(struct state *st, struct coin *cn, struct moveset *possible) {
 	int i;
 	enum direction dir;
 	for(i=0; i<fixed_props[cn->type].num_dir; i++) {
 		dir = fixed_props[cn->type].allowed[i];
-		debug("\tsingle>\tdir = %s\n", dirname[cn->allowed[i]]);
-		if( isBlank(pos(cn, i, 1)))
+		debug("\tsingle>\tdir = %s\n", dirname[dir]);
+		if( isBlank(st, pos(cn, i, 1)))
 			moveset_addMoves(possible, cn, pos(cn, i, 1), 0);
-		else if( isOpp(pos(cn, i, 1)))
+		else if( isOpp(st, pos(cn, i, 1)))
 			moveset_addMoves(possible, cn, pos(cn, i, 1), MOVE_FLAG_KILLED);
 	}
 }

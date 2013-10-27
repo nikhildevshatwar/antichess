@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-//#define DEBUG
+#define DEBUG
 
 #define MOVE_FLAG_RESPAWN	1<<0
 #define MOVE_FLAG_KILLED	1<<1
@@ -14,6 +14,7 @@
 	#define debug(...)
 #endif
 
+#define multiplier(coin) (coin->color == COLOR_WHITE ? 1 : -1)
 #define pos(coin, dir, count) (coin->x + fixed_props[coin->type].x_inc[dir] * count * multiplier(coin)), (coin->y + fixed_props[coin->type].y_inc[dir] * count * multiplier(coin))
 #define get_ypos(coin) coin->color == COLOR_WHITE ? coin->y : 7 - coin->y
 #define to_coin_data(coinptr) ((struct coin_data *) &(coinptr)->type)
@@ -81,9 +82,15 @@ struct coin {
 	short color;
 };
 
+struct state {
+	struct coin board[8][8];
+	enum color COLOR_SELF;
+	enum color COLOR_OPP;
+};
+
 struct coin_properties {
 	char *name;						// name of the coin - can be Blank
-	int (*calc_moves)(struct coin *, struct moveset *);	// return no of moves added, and update moveset
+	int (*calc_moves)(struct state *st, struct coin *, struct moveset *);	// return no of moves added, and update moveset
 	int (*isValid)(struct coin *, struct move *);		// return wheather a move is correct or not
 	enum direction allowed[MAX_DIR];			// where all it can move
 	short num_dir;
@@ -102,14 +109,18 @@ void moveset_print (struct moveset *ms);
 void move_describe();		//print move in human (chess expert) readble form
 void move_parse();		//accept moves from user and convert to struct move
 
-int isOpp(short x, short y);
-int isBlank(short x, short y);
-int isNotSelf(short x, short y);
+void board_init(struct coin (*board)[8]);
+void board_print(struct coin (*board)[8]);
+void board_print_asciiart(struct coin (*board)[8]);
 
-int calc_moves_multi(struct coin *cn, struct moveset *possible);
-int calc_moves_one(struct coin *cn, struct moveset *possible);
-int calc_moves_pawn(struct coin *cn, struct moveset *possible);
-int calc_moves_none(struct coin *cn, struct moveset *possible);
+inline int isOpp(struct state *st, short x, short y);
+inline int isBlank(struct state *st, short x, short y);
+inline int isNotSelf(struct state *st, short x, short y);
+
+int calc_moves_multi(struct state *st, struct coin *cn, struct moveset *possible);
+int calc_moves_one(struct state *st, struct coin *cn, struct moveset *possible);
+int calc_moves_pawn(struct state *st, struct coin *cn, struct moveset *possible);
+int calc_moves_none(struct state *st, struct coin *cn, struct moveset *possible);
 
 int king_isValidMove(struct coin *cn, struct move *mv);
 int queen_isValidMove(struct coin *cn, struct move *mv);
@@ -118,9 +129,6 @@ int knight_isValidMove(struct coin *cn, struct move *mv);
 int rook_isValidMove(struct coin *cn, struct move *mv);
 int pawn_isValidMove(struct coin *cn, struct move *mv);
 
-extern struct coin board[8][8];
 extern struct coin_properties fixed_props[];
-extern enum color COLOR_OPP;
-extern enum color COLOR_SELF;
 extern char *dirname[];;
 #endif

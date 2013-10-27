@@ -23,6 +23,7 @@ char *dirname[] = {
 	"right_back_diag",
 	"back",
 	"left_back_diag",
+	"invalid"
 };
 
 char initial_setup[8][8] = {
@@ -36,9 +37,7 @@ char initial_setup[8][8] = {
 	'r','n','b','q','k','b','n','r',
 };
 
-struct coin board[8][8];	//current situation - this goes on the stack
-
-void board_init() {
+void board_init(struct coin (*board)[8]) {
 	int i, j, k, idx;
 	enum coin_type type;
 	short col;
@@ -80,7 +79,7 @@ For all black coins, the coefficients are negative
 	}
 }
 
-void board_print() {
+void board_print(struct coin (*board)[8]) {
 	int i, j;
 	char disp[] = { 'k','q','b','n','r','p',' ' };
 	for(i=7; i>=0; i--) {
@@ -92,7 +91,7 @@ void board_print() {
 	printf("\n+---+---+---+---+---+---+---+---+\n");
 }
 
-void board_print_asciiart() {
+void board_print_asciiart(struct coin (*board)[8]) {
 	int i, j, k, idx;
 	char s;
 	char *col;
@@ -122,31 +121,31 @@ void board_print_asciiart() {
 	}
 }
 
-int isOpp(short x, short y) {
+inline int isOpp(struct state *st, short x, short y) {
 	debug ("\t\tAttempting to kill %d %d\n", x, y);
 	if(x<0 || y<0 || x>7 || y>7)
 		return 0;
-	if(board[y][x].color == COLOR_OPP)
+	if(st->board[y][x].color == st->COLOR_OPP)
 		return 1;
 	else
 		return 0;
 }
 
-int isBlank(short x, short y) {
+inline int isBlank(struct state *st, short x, short y) {
 	debug ("\t\tAttempting to reach %d %d\n", x, y);
 	if(x<0 || y<0 || x>7 || y>7)
 		return 0;
-	if(board[y][x].color == COLOR_NONE)
+	if(st->board[y][x].color == COLOR_NONE)
 		return 1;
 	else
 		return 0;
 }
 
-int isNotSelf(short x, short y) {
+inline int isNotSelf(struct state *st, short x, short y) {
 	debug ("\t\tAttempting to move %d %d\n", x, y);
 	if(x<0 || y<0 || x>7 || y>7)
 		return 0;
-	if(board[y][x].color != COLOR_SELF)
+	if(st->board[y][x].color != st->COLOR_SELF)
 		return 1;
 	else
 		return 0;

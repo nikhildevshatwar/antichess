@@ -24,31 +24,28 @@ opt2 - make board as array of pointers to the struct coin
 		Might be dangerous, 
 */
 
-enum color COLOR_SELF = COLOR_WHITE;
-enum color COLOR_OPP = COLOR_BLACK;
-
-void swapPlayers() {
+void swapPlayers(struct state *st) {
 	int temp;
-	temp = COLOR_SELF;
-	COLOR_SELF = COLOR_OPP;
-	COLOR_OPP = temp;
+	temp = st->COLOR_SELF;
+	st->COLOR_SELF = st->COLOR_OPP;
+	st->COLOR_OPP = temp;
 }
 
-calc (struct  moveset *ms) {
+calc (struct state *st, struct  moveset *ms) {
 	int i,j;
 	struct coin *cn;
 	for(i=0; i<8; i++) {
 		for(j=0; j<8; j++) {
-			cn = &board[i][j];
-			debug("Calculating move for %s(%d,%d)\n", cn->name, cn->x, cn->y);
-			if(cn->color != COLOR_SELF)
+			cn = &(st->board[i][j]);
+			debug("Calculating move for %s(%d,%d)\n", fixed_props[cn->type].name, cn->x, cn->y);
+			if(cn->color != st->COLOR_SELF)
 				continue;
-			(*fixed_props[cn->type].calc_moves)(cn, ms);
+			(*fixed_props[cn->type].calc_moves)(st, cn, ms);
 		}
 	}
 }
 
-void iterate(struct moveset *ms) {
+void iterate(struct state *st, struct moveset *ms) {
 	int i;
 	struct move *mv;
 	struct coin_data *srcdata;
@@ -59,13 +56,13 @@ void iterate(struct moveset *ms) {
 		mv = &ms->possible[i];
 		printf("Performing %d move %d,%d -> %d->%d\n", i, mv->sx, mv->sy, mv->dx, mv->dy);
 		srcdata = to_coin_data(mv->cn);
-		dstdata = to_coin_data(&board[mv->dy][mv->dx]);
+		dstdata = to_coin_data(&(st->board[mv->dy][mv->dx]));
 	//Make the move
 		temp = *dstdata;
 		*dstdata = *srcdata;
 		*srcdata = empty;
 	//Print the board
-		board_print_asciiart();
+		board_print_asciiart(st->board);
 	//Restore the move
 		*srcdata = *dstdata;
 		*dstdata = temp;
@@ -75,22 +72,28 @@ getchar();
 
 int main() {
 	struct moveset ms;
+	struct state s1;
 
 	moveset_init (&ms);
-	board_init();
-	board_print();
-	board_print_asciiart();
+	board_init(s1.board);
+	s1.COLOR_SELF = COLOR_WHITE;
+	s1.COLOR_OPP = COLOR_BLACK;
+
+	board_print(s1.board);
+	board_print_asciiart(s1.board);
 	getchar();
 
-	calc(&ms);
+	calc(&s1, &ms);
 	moveset_print(&ms);
 
-	iterate(&ms);
-	swapPlayers();
+	iterate(&s1, &ms);
+	swapPlayers(&s1);
+
 	moveset_init (&ms);
-	calc(&ms);
-	iterate(&ms);
-	board_print_asciiart();
+	calc(&s1, &ms);
+	iterate(&s1, &ms);
+
+	board_print_asciiart(s1.board);
 
 	return 0;
 }
