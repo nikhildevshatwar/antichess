@@ -31,7 +31,7 @@ void swapPlayers(struct state *st) {
 	st->COLOR_OPP = temp;
 }
 
-calc (struct state *st, struct  moveset *ms) {
+void calc (struct state *st, struct  moveset *ms) {
 	int i,j;
 	struct coin *cn;
 	for(i=0; i<8; i++) {
