@@ -124,7 +124,7 @@ int calc_moves_pawn(struct state *st, struct coin *cn, struct moveset *possible)
 	if(isBlank(st, pos(cn, 1, 1))) {			//str
 		moveset_addMoves(possible, cn, pos(cn, 1, 1), flags);
 		if(get_ypos(cn) == 1 && isBlank(st, pos(cn, 1, 2)))		//handle 2moves if at start
-			moveset_addMoves(possible, cn, pos(cn, 1, 2), 0);
+			moveset_addMoves(possible, cn, pos(cn, 1, 2), flags);
 	}
 	if(isOpp(st, pos(cn, 2, 1)))			//right_str_diag
 		moveset_addMoves(possible, cn, pos(cn, 2, 1), flags | MOVE_FLAG_KILLED);

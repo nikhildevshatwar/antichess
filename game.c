@@ -55,7 +55,7 @@ void iterate(struct state *st, struct moveset *ms) {
 	for(i=0; i<ms->validCount; i++) {
 		mv = &ms->possible[i];
 		printf("Performing %d move %d,%d -> %d->%d\n", i, mv->sx, mv->sy, mv->dx, mv->dy);
-		srcdata = to_coin_data(mv->cn);
+		srcdata = to_coin_data(&(st->board[mv->sy][mv->sx]));
 		dstdata = to_coin_data(&(st->board[mv->dy][mv->dx]));
 	//Make the move
 		temp = *dstdata;
@@ -70,7 +70,31 @@ getchar();
 	}
 }
 
-int main() {
+struct moveset *make_random_move(struct state *s, struct moveset *ms) {
+	int i = rand() % ms->validCount;
+
+	printf("Selected %d randomly", i);
+	move_make(s, &ms->possible[i]);
+}
+
+crawl(struct state *s, struct moveset *ms) {
+	struct moveset newset;
+	struct move *mv;
+
+	mv = make_random_move(s, ms);
+
+	swapPlayers(s);
+	moveset_init(&newset);
+	calc(s, &newset);
+
+	board_print(s->board);
+	board_print_asciiart(s->board);
+	getchar();
+	crawl(s, &newset);
+//	revert_move(s, mv);
+}
+
+int main_check_all_moves() {
 	struct moveset ms;
 	struct state s1;
 
@@ -96,4 +120,24 @@ int main() {
 	board_print_asciiart(s1.board);
 
 	return 0;
+}
+
+int main() {
+	struct moveset ms;
+	struct state s1;
+
+	moveset_init (&ms);
+	board_init(s1.board);
+	s1.COLOR_SELF = COLOR_WHITE;
+	s1.COLOR_OPP = COLOR_BLACK;
+
+	board_print(s1.board);
+	board_print_asciiart(s1.board);
+	getchar();
+
+	calc(&s1, &ms);
+	moveset_print(&ms);
+
+	crawl(&s1, &ms);
+
 }

@@ -1,7 +1,10 @@
+CFLAGS = -g
+#CFLAGS += -Wall -pedantic -ansi -std=c99
+
 all: play-game
 
 play-game: *.c *.h
-	gcc *.c -o play-game
+	gcc *.c $(CFLAGS) -o play-game
 
 parser: grammer.yacc
 	yacc -d 

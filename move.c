@@ -20,6 +20,21 @@ void move_describe(struct move *mv) {
 	printf("%c%d -> %c%d\n", mv->sx + 'a', mv->sy, mv->dx + 'a', mv->dy);
 }
 
+void move_make(struct state *s, struct move *mv) {
+	struct coin_data saved;
+	struct coin_data *srcdata;
+	struct coin_data *dstdata;
+
+	printf("Performing move %d,%d -> %d->%d\n", mv->sx, mv->sy, mv->dx, mv->dy);
+	srcdata = to_coin_data(&(s->board[mv->sy][mv->sx]));
+	dstdata = to_coin_data(&(s->board[mv->dy][mv->dx]));
+
+	saved = *dstdata;
+	*dstdata = *srcdata;
+	srcdata->type = COIN_BLANK;
+	srcdata->color = COLOR_NONE;
+}
+
 void moveset_init(struct moveset *ms) {
 	ms->size = 100;
 	ms->validCount = 0;
