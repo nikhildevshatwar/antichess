@@ -9,7 +9,8 @@
 #define MOVE_FLAG_KILLED	1<<1
 
 #ifdef DEBUG
-	#define debug printf
+	FILE *dbgfp;
+	#define debug(format, arg...) fprintf(dbgfp, format , ## arg)
 #else
 	#define debug(...)
 #endif

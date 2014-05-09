@@ -87,7 +87,6 @@ crawl(struct state *s, struct moveset *ms) {
 	moveset_init(&newset);
 	calc(s, &newset);
 
-	board_print(s->board);
 	board_print_asciiart(s->board);
 	getchar();
 	crawl(s, &newset);
@@ -123,6 +122,10 @@ int main_check_all_moves() {
 }
 
 int main() {
+
+#ifdef DEBUG
+	dbgfp = fopen("debug.log", "w");
+#endif
 	struct moveset ms;
 	struct state s1;
 
